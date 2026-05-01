@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mon-FPS</title>
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; background: #111; color: #eee; font-family: system-ui, sans-serif; overflow: hidden; }
+    #app { position: relative; width: 100vw; height: 100vh; }
+    canvas { display: block; outline: none; }
+
+    #menu {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: radial-gradient(circle at 50% 30%, #2a2a3a, #0a0a14);
+      gap: 20px; z-index: 10;
+    }
+    #menu h1 { font-size: 48px; margin: 0; letter-spacing: 4px; }
+    #menu p  { margin: 0; opacity: 0.7; }
+    #classes { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; max-width: 720px; }
+    .class-card {
+      width: 150px; padding: 14px; border-radius: 12px;
+      background: #1c1c28; border: 2px solid #2c2c3c; cursor: pointer;
+      transition: border-color 0.15s, transform 0.1s;
+    }
+    .class-card:hover { transform: translateY(-2px); }
+    .class-card.selected { border-color: #ffd84a; }
+    .class-card h3 { margin: 0 0 6px 0; }
+    .class-card .stat { font-size: 12px; opacity: 0.7; }
+    #name { padding: 10px 14px; font-size: 16px; border-radius: 8px; border: 1px solid #333; background: #1c1c28; color: #eee; }
+    #play {
+      padding: 12px 36px; font-size: 18px; font-weight: bold;
+      background: #ffd84a; color: #111; border: none; border-radius: 8px; cursor: pointer;
+    }
+    #play:hover { background: #ffe87a; }
+
+    #hud { position: absolute; inset: 0; pointer-events: none; z-index: 5; display: none; }
+    #crosshair {
+      position: absolute; left: 50%; top: 50%; width: 12px; height: 12px;
+      transform: translate(-50%, -50%);
+      border: 2px solid rgba(255,255,255,0.85);
+      border-radius: 50%;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.5);
+    }
+    #stats {
+      position: absolute; left: 16px; bottom: 16px;
+      font-size: 22px; font-weight: bold;
+      text-shadow: 0 1px 2px black;
+    }
+    #stats .hp  { color: #ff6464; }
+    #stats .sub { font-size: 14px; opacity: 0.8; }
+    #killfeed {
+      position: absolute; right: 16px; top: 16px;
+      font-size: 14px; line-height: 1.4; text-align: right;
+      text-shadow: 0 1px 2px black;
+    }
+    #scoreboard {
+      position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.75); padding: 16px 24px; border-radius: 8px;
+      font-size: 14px; min-width: 320px; display: none;
+    }
+    #scoreboard table { width: 100%; border-collapse: collapse; }
+    #scoreboard th, #scoreboard td { padding: 4px 8px; text-align: left; }
+    #scoreboard th { border-bottom: 1px solid #444; }
+    #deathOverlay {
+      position: absolute; inset: 0; display: none;
+      align-items: center; justify-content: center; flex-direction: column;
+      background: rgba(80, 0, 0, 0.35); font-size: 32px; font-weight: bold;
+    }
+    #pauseHint {
+      position: absolute; left: 50%; top: 70%; transform: translateX(-50%);
+      font-size: 14px; opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <canvas id="game"></canvas>
+
+    <div id="menu">
+      <h1>MON-FPS</h1>
+      <p>Pick your mon. WASD move, mouse look, click shoot, Space jump, Tab scoreboard.</p>
+      <input id="name" placeholder="name" maxlength="16" />
+      <div id="classes"></div>
+      <button id="play">PLAY</button>
+    </div>
+
+    <div id="hud">
+      <div id="crosshair"></div>
+      <div id="stats"><span class="hp" id="hp">100</span> <span class="sub" id="cls">SPARKY</span></div>
+      <div id="killfeed"></div>
+      <div id="scoreboard"></div>
+      <div id="deathOverlay">YOU DIED<br><span id="respawnIn" style="font-size:18px;opacity:0.8">respawning…</span></div>
+      <div id="pauseHint">click to lock cursor — Esc to release</div>
+    </div>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
