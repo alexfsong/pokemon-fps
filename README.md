@@ -1,17 +1,14 @@
 # mon-fps
 
-Browser-based first-person shooter with monster characters. 4+ player multiplayer. Built for a small VPS (4 GB RAM, 40 GB disk).
+Browser-based first-person shooter with monster characters. 4+ player multiplayer. Authoritative Node.js server (Colyseus) + Three.js WebGL client. Hitscan only, AABB collision — no physics engine, fits well under a small VPS budget.
 
-Authoritative Node.js server (Colyseus) + Three.js WebGL client. Hitscan only, AABB collision, no physics engine — fits well under the RAM budget.
-
-> **IP note:** This repo ships four original archetype creatures (Sparky, Flame, Splash, Vine) and a `.glb` asset slot at `client/public/models/<classId>.glb`. Pokémon names/sprites are not included and shouldn't be committed — they're trademarks. Drop your own models in if you want to skin a private server with friends.
+> **IP note:** Repo ships four original archetype creatures (Sparky, Flame, Splash, Vine) and a `.glb` asset slot at `client/public/models/<classId>.glb`. Pokémon names/sprites are not included and shouldn't be committed — they're trademarks. Drop your own models in for a private server with friends.
 
 ## Stack
 
 - **Client:** TypeScript, Vite, Three.js, `colyseus.js`
 - **Server:** Node 20, TypeScript, Colyseus 0.15
 - **Shared:** schemas + map + physics, imported by both sides via npm workspaces
-- **Deploy:** Docker + Caddy (auto-TLS)
 
 ## Run locally
 
@@ -19,28 +16,40 @@ Authoritative Node.js server (Colyseus) + Three.js WebGL client. Hitscan only, A
 npm install
 npm run build:shared
 
-# terminal 1
+# terminal 1 — listens on 127.0.0.1:8001
 npm run dev:server
 
-# terminal 2
+# terminal 2 — Vite dev server with proxy at 5173
 npm run dev:client
 ```
 
-Open http://localhost:5173 in two tabs to test multiplayer.
+Open http://localhost:5173 in two tabs to test.
 
-## Deploy on a VPS
+## Deploy on the shared Hetzner box
 
-1. Point a domain's A record at the VPS.
-2. SSH in, install Docker + docker-compose.
-3. Clone the repo, then:
+This app follows the conventions in [`research-webhook/INFRA.md`](https://github.com/alexfsong/research-webhook/blob/main/INFRA.md). Reserved port: **8001**. Hostname: **`monfps.195-201-99-206.sslip.io`**.
+
+Bootstrap (run once, as root on the box):
 
 ```bash
-DOMAIN=yourdomain.com docker compose up -d --build
+git clone https://github.com/alexfsong/pokemon-fps /tmp/monfps-src
+sudo bash /tmp/monfps-src/deploy/install.sh
 ```
 
-Caddy fetches a Let's Encrypt cert automatically. Game listens on 443.
+Then add the Caddy block from `deploy/Caddyfile.snippet` to `/etc/caddy/Caddyfile` and reload:
 
-Expected resource use with 4 players: ~250 MB RAM, < 30% of one CPU core.
+```bash
+sudo systemctl reload caddy
+curl -fsS https://monfps.195-201-99-206.sslip.io/health
+```
+
+Update flow:
+```bash
+sudo -u researcher bash -lc 'cd /home/researcher/monfps && git pull && npm install && npm run build'
+sudo systemctl restart monfps.service
+```
+
+Resource use: idle ~150 MB, four players ~250 MB, < 30% of one CPU core.
 
 ## Controls
 

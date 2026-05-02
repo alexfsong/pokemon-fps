@@ -1,0 +1,22 @@
+[Unit]
+Description=Mon-FPS — browser FPS multiplayer game server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=researcher
+Group=researcher
+WorkingDirectory=/home/researcher/monfps
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=8001
+Environment=CLIENT_DIR=/home/researcher/monfps/client/dist
+ExecStart=/usr/bin/node /home/researcher/monfps/server/dist/index.js
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

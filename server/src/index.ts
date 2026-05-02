@@ -5,11 +5,12 @@ import { Server } from "@colyseus/core";
 import { WebSocketTransport } from "@colyseus/ws-transport";
 import { ArenaRoom } from "./ArenaRoom";
 
-const PORT = parseInt(process.env.PORT ?? "2567", 10);
+const PORT = parseInt(process.env.PORT ?? "8001", 10);
+const HOST = process.env.HOST ?? "127.0.0.1";
 const CLIENT_DIR = process.env.CLIENT_DIR ?? path.resolve(__dirname, "../../client/dist");
 
 const app = express();
-app.get("/healthz", (_req, res) => res.send("ok"));
+app.get("/health", (_req, res) => res.send("ok"));
 app.use(express.static(CLIENT_DIR, { maxAge: "1h" }));
 app.get("*", (_req, res) => res.sendFile(path.join(CLIENT_DIR, "index.html")));
 
@@ -20,6 +21,6 @@ const gameServer = new Server({
 
 gameServer.define("arena", ArenaRoom);
 
-gameServer.listen(PORT).then(() => {
-  console.log(`[server] listening on :${PORT}, serving client from ${CLIENT_DIR}`);
+gameServer.listen(PORT, HOST).then(() => {
+  console.log(`[server] listening on ${HOST}:${PORT}, serving client from ${CLIENT_DIR}`);
 });
